@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/text_field_input.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -16,6 +20,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  bool _isLoading = false;
+  Uint8List? _image;
 
   // ♦♦ The "dispose()" Method
   //    → which "Releases" the "Memory Allocated"
@@ -27,6 +33,48 @@ class _SignupScreenState extends State<SignupScreen> {
     _passwordController.dispose();
     _bioController.dispose();
     _usernameController.dispose();
+  }
+
+  // ♦♦ The "selectImage()" Method
+  //     → for Picking the User Image:
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+
+    // ♦ We "Set State"
+    //    → because we Need to "Display" the "Image"
+    //   → we "Selected" on the "Circle Avatar":
+    setState(() {
+      _image = im;
+    });
+  }
+
+  // ♦♦ The "selectImage()" Method
+  void signUpUser() async {
+    // ♦♦ Set "Loading" to "True":
+    setState(() {
+      _isLoading = true;
+    });
+
+    // ♦♦ "SignUp User" using our "AuthMethods":
+    String res = await AuthMethods().signUpUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+      username: _usernameController.text,
+      bio: _bioController.text,
+      file: _image!,
+    );
+
+    // ♦♦ Set "Loading" to "False":
+    setState(() {
+      _isLoading = false;
+    });
+
+    // ♦♦ Checking: If "String Returned" is "Success"
+    //    → and "User" has been "Created":
+    if (res != "success") {
+      // ♦♦ Show the Error:
+      showSnackBar(context, res);
+    }
   }
 
   // ♦♦ The "build()" Method:
@@ -63,15 +111,26 @@ class _SignupScreenState extends State<SignupScreen> {
               //     → which "Positions" its "Children"
               //     → Relative to the "Edges" of its "Box":
               Stack(
-                children: const [
-                  // ♦♦ The "Circular Avatar" Widget
-                  //     → to "Accept" and "Show"
-                  //     → the "Selected File":
-                  CircleAvatar(
-                    radius: 64,
-                    backgroundImage: NetworkImage(
-                        'https://images.unsplash.com/photo-1633113215988-4eaddc3965d9?ixlib=rb-1.2.16ixid=MnwxMjA3fDF8MH'),
-                  ),
+                children: [
+                  // ♦♦ The "Ternary Conditional Operator":
+                  _image != null
+
+                      // ♦♦ The "Circular Avatar" Widget
+                      //     → to "Accept" and "Show"
+                      //     → the "Selected File":
+                      ? CircleAvatar(
+                          radius: 64,
+                          backgroundImage: MemoryImage(_image!),
+                          backgroundColor: Colors.red,
+                        )
+                      : const CircleAvatar(
+                          radius: 64,
+
+                          // ♦ Default Profile Image:
+                          backgroundImage: NetworkImage(
+                              'https://i.stack.imgur.com/l60Hf.png'),
+                          backgroundColor: Colors.red,
+                        ),
 
                   // ♦♦ The "Positioned()" Widget
                   //     → Control "Where" is "Positioned"
@@ -82,8 +141,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
                     // ♦ The "IconButton()" Widget:
                     child: IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.add_a_photo),
+                      onPressed: selectImage,
+                      icon: const Icon(Icons.add_a_photo),
                     ),
                   )
                 ],
@@ -148,6 +207,7 @@ class _SignupScreenState extends State<SignupScreen> {
               //   → is a "Rectangular Area" of a "Material"
               //   → that "Responds" to "Touch".
               InkWell(
+                onTap: signUpUser,
                 child: Container(
                   width: double.infinity,
                   alignment: Alignment.center,
@@ -158,7 +218,15 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     color: blueColor,
                   ),
-                  child: const Text('Sign up'),
+
+                  // ♦♦  Checking the "_isLoading":
+                  child: !_isLoading
+                      ? const Text(
+                          'Sign up',
+                        )
+                      : const CircularProgressIndicator(
+                          color: primaryColor,
+                        ),
                 ),
               ),
 
