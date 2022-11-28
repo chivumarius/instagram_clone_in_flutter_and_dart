@@ -11,7 +11,8 @@ class AuthMethods {
   // ♦♦ Creating the "Instance" of "FirebaseAuth" Class:
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // ♦♦ The "signUpUser" Async Function:
+  // ♦♦ The "signUpUser" Async Function
+  //    → with the "Required Parameters" for "Sign Up User":
   Future<String> signUpUser({
     required String email,
     required String password,
@@ -25,7 +26,7 @@ class AuthMethods {
     // ♦♦ The "Try - Catch" Block:
     try {
       // ♦♦ Creating "Validation"
-      //   → by "Checking" the "Condition" → "isNotEmpty":
+      //   → by the "Condition" → "isNotEmpty":
       if (email.isNotEmpty ||
           password.isNotEmpty ||
           username.isNotEmpty ||
@@ -42,7 +43,8 @@ class AuthMethods {
         String photoUrl = await StorageMethods()
             .uploadImageToStorage('profilePics', file, false);
 
-        // ♦ Adding "User" in our "Database":
+        // ♦ Adding "User" in our "Database"
+
         await _firestore.collection("users").doc(cred.user!.uid).set({
           'username': username,
           'uid': cred.user!.uid,
@@ -72,6 +74,44 @@ class AuthMethods {
     }
 
     // ♦ Returning the "Response":
+    return res;
+  }
+
+  // ♦♦ The "loginUser" Async Method
+  //    → with the "Required Parameters" for "Log In User":
+  Future<String> loginUser({
+    required String email,
+    required String password,
+  }) async {
+    // ♦♦ Variable:
+    String res = "Some error Occurred";
+
+    // ♦♦ The "Try - Catch" Block:
+    try {
+      // ♦♦ Creating "Validation"
+      //   → by the "Condition" → "isNotEmpty":
+      if (email.isNotEmpty || password.isNotEmpty) {
+        // ♦♦ "Sign In" the "User" in "Auth"
+        //     → with "Email" and "Password":
+        await _auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        res = "success";
+      } else {
+        res = "Please enter all the fields";
+      }
+
+      // ♦♦ To "Add" More "Error Details":
+      // } on FirebaseAuthException catch (err) {
+      //   if (err.code == 'user-not-found') {
+      //     res = 'The user does not exist.';
+      //   } else if (err.code == 'wrong-password') {
+      //     res = 'The password is wrong.';
+      //   }
+    } catch (err) {
+      return err.toString();
+    }
     return res;
   }
 }

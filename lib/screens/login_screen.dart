@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/text_field_input.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,6 +17,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  // ♦ The "Loading Indicator" Variable:
+  //   → Setted to "False":
+  bool _isLoading = false;
+
   // ♦♦ The "dispose()" Method
   //    → which "Releases" the "Memory Allocated"
   //    → to the Existing "Variables" of the "State":
@@ -23,6 +29,41 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+  }
+
+  // ♦♦ The "loginUser()" Method:
+  void loginUser() async {
+    // ♦♦ Setting the "Loading Indicator" to "True":
+    setState(() {
+      _isLoading = true;
+    });
+
+    // ♦♦ The "res" Variable
+    //     → to "Log In User" using our "AuthMethods":
+    String res = await AuthMethods().loginUser(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+
+    // ♦♦ Checking: If "String Returned" is "Success"
+    //    → then "User" can be "Log In":
+    if (res == 'success') {
+      // ♦♦ Setting the "Loading Indicator" to "False":
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      // ♦♦ Setting the "Loading Indicator" to "False":
+      setState(() {
+        _isLoading = false;
+      });
+
+      // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+      if (!mounted) return;
+
+      // ♦♦ Showing the Error:
+      showSnackBar(context, res);
+    }
   }
 
   // ♦♦ The "build()" Method:
@@ -83,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
               //   → is a "Rectangular Area" of a "Material"
               //   → that "Responds" to "Touch".
               InkWell(
+                onTap: loginUser,
                 child: Container(
                   width: double.infinity,
                   alignment: Alignment.center,
@@ -93,7 +135,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     color: blueColor,
                   ),
-                  child: const Text('Log in'),
+
+                  // ♦♦ The "Ternary Operator"
+                  //      → for "Checking" the "_isLoading" Variable
+                  //      → and "Displaying" the "Button Text"
+                  //     → or the "Loading Indicator":
+                  child: !_isLoading
+                      ?
+                      // ♦ The "Log In" Text Display:
+                      const Text(
+                          'Log in',
+                        )
+                      :
+                      // ♦ The "CircularProgressIndicator()" Widget Display:
+                      const CircularProgressIndicator(
+                          color: primaryColor,
+                        ),
                 ),
               ),
 

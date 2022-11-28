@@ -20,7 +20,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  // ♦ The "Loading Indicator" Variable:
+  //   → Setted to "False":
   bool _isLoading = false;
+
   Uint8List? _image;
 
   // ♦♦ The "dispose()" Method
@@ -50,12 +53,13 @@ class _SignupScreenState extends State<SignupScreen> {
 
   // ♦♦ The "selectImage()" Method
   void signUpUser() async {
-    // ♦♦ Set "Loading" to "True":
+    // ♦♦ Setting the "Loading Indicator" to "True":
     setState(() {
       _isLoading = true;
     });
 
-    // ♦♦ "SignUp User" using our "AuthMethods":
+    // ♦♦ The "res" Variable
+    //     → to "Sign Up User" using our "AuthMethods":
     String res = await AuthMethods().signUpUser(
       email: _emailController.text,
       password: _passwordController.text,
@@ -64,7 +68,7 @@ class _SignupScreenState extends State<SignupScreen> {
       file: _image!,
     );
 
-    // ♦♦ Set "Loading" to "False":
+    // ♦♦ Setting the "Loading Indicator" to "False":
     setState(() {
       _isLoading = false;
     });
@@ -72,6 +76,9 @@ class _SignupScreenState extends State<SignupScreen> {
     // ♦♦ Checking: If "String Returned" is "Success"
     //    → and "User" has been "Created":
     if (res != "success") {
+      // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+      if (!mounted) return;
+
       // ♦♦ Show the Error:
       showSnackBar(context, res);
     }
@@ -219,12 +226,19 @@ class _SignupScreenState extends State<SignupScreen> {
                     color: blueColor,
                   ),
 
-                  // ♦♦  Checking the "_isLoading":
+                  // ♦♦ The "Ternary Operator"
+                  //      → for "Checking" the "_isLoading" Variable
+                  //      → and "Displaying" the "Button Text"
+                  //      → or the "Loading Indicator":
                   child: !_isLoading
-                      ? const Text(
+                      ?
+                      // ♦ The "Sign Up" Text Display:
+                      const Text(
                           'Sign up',
                         )
-                      : const CircularProgressIndicator(
+                      :
+                      // ♦ The "CircularProgressIndicator()" Widget Display:
+                      const CircularProgressIndicator(
                           color: primaryColor,
                         ),
                 ),
