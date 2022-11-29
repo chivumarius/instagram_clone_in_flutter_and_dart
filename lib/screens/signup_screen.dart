@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
+import 'package:instagram_flutter/responsive/mobile_screen_layout.dart';
+import 'package:instagram_flutter/responsive/responsive_layout_screen.dart';
+import 'package:instagram_flutter/responsive/web_screen_layout.dart';
+import 'package:instagram_flutter/screens/login_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/text_field_input.dart';
@@ -21,7 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   // ♦ The "Loading Indicator" Variable:
-  //   → Setted to "False":
+  //   → Set to "False":
   bool _isLoading = false;
 
   Uint8List? _image;
@@ -81,7 +85,37 @@ class _SignupScreenState extends State<SignupScreen> {
 
       // ♦♦ Show the Error:
       showSnackBar(context, res);
+    } else {
+      // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+      if (!mounted) return;
+
+      // ♦ "Navigate" to the "Home Screen":
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            mobileScreenLayout: MobileScreenLayout(),
+            webScreenLayout: WebScreenLayout(),
+          ),
+        ),
+      );
     }
+
+    // ♦♦ Setting the "Loading Indicator" to "False":
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  // ♦♦ The "navigateToLogin()" Method:
+  void navigateToLogin() {
+    // ♦♦ "Redirecting" the "User",
+    //    → to the "LoginScreen"
+    //    → after Clicking the "Login" Link:
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      ),
+    );
   }
 
   // ♦♦ The "build()" Method:
@@ -271,7 +305,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   //   → through the "GestureDetector()" Widget
                   //   → that Detects Gestures:
                   GestureDetector(
-                    onTap: () {},
+                    onTap: navigateToLogin,
 
                     // ♦♦ Sign Up:
                     child: Container(

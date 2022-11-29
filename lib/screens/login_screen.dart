@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_flutter/resources/auth_methods.dart';
+import 'package:instagram_flutter/responsive/mobile_screen_layout.dart';
+import 'package:instagram_flutter/responsive/responsive_layout_screen.dart';
+import 'package:instagram_flutter/responsive/web_screen_layout.dart';
+import 'package:instagram_flutter/screens/signup_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/text_field_input.dart';
@@ -18,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   // ♦ The "Loading Indicator" Variable:
-  //   → Setted to "False":
+  //   → Set to "False":
   bool _isLoading = false;
 
   // ♦♦ The "dispose()" Method
@@ -48,22 +52,39 @@ class _LoginScreenState extends State<LoginScreen> {
     // ♦♦ Checking: If "String Returned" is "Success"
     //    → then "User" can be "Log In":
     if (res == 'success') {
-      // ♦♦ Setting the "Loading Indicator" to "False":
-      setState(() {
-        _isLoading = false;
-      });
-    } else {
-      // ♦♦ Setting the "Loading Indicator" to "False":
-      setState(() {
-        _isLoading = false;
-      });
+      // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+      if (!mounted) return;
 
+      // ♦♦ "Redirecting" the "User",
+      //    → to the "LoginScreen"
+      //    → after Clicking the "Login" Link:
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const ResponsiveLayout(
+            mobileScreenLayout: MobileScreenLayout(),
+            webScreenLayout: WebScreenLayout(),
+          ),
+        ),
+      );
+    } else {
       // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
       if (!mounted) return;
 
       // ♦♦ Showing the Error:
       showSnackBar(context, res);
     }
+  }
+
+  // ♦♦ The "navigateToSignup()" Method:
+  void navigateToSignup() {
+    // ♦♦ "Redirecting" the "User",
+    //    → to the "SignupScreen"
+    //    → after Clicking the "Signup" Link:
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SignupScreen(),
+      ),
+    );
   }
 
   // ♦♦ The "build()" Method:
@@ -181,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   //   → through the "GestureDetector()" Widget
                   //   → that Detects Gestures:
                   GestureDetector(
-                    onTap: () {},
+                    onTap: navigateToSignup,
 
                     // ♦♦ Sign Up:
                     child: Container(
