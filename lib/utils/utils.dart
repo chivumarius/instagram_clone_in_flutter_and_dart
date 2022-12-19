@@ -13,7 +13,7 @@ pickImage(ImageSource source) async {
     return await _file.readAsBytes();
   }
   // ♦ Otherwise:
-  print('No Image Selected');
+  debugPrint('No Image Selected');
 }
 
 // ♦♦ The "showSnackBar()" Function
