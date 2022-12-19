@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/global_variable.dart';
 
 // ♦♦ The "Dynamic Class":
 class MobileScreenLayout extends StatefulWidget {
@@ -52,13 +53,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
         controller: pageController,
         onPageChanged: onPageChanged,
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          Text('Feed Screen'),
-          Text('Search Screen'),
-          Text('Add Post Screen'),
-          Text('Notification Screen'),
-          Text('Profile Screen'),
-        ],
+        children: homeScreenItems,
       ),
       bottomNavigationBar: CupertinoTabBar(
         backgroundColor: mobileBackgroundColor,
@@ -102,6 +97,10 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
             backgroundColor: primaryColor,
           ),
         ],
+
+        // ♦ "Navigation" on "Tap":
+        onTap: navigationTapped,
+
         currentIndex: _page,
       ),
     );
