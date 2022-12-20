@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:uuid/uuid.dart';
 // import 'package:uuid/uuid.dart';
 
 class StorageMethods {
@@ -19,11 +20,12 @@ class StorageMethods {
     Reference ref =
         _storage.ref().child(childName).child(_auth.currentUser!.uid);
 
-    // ♦♦ Checking
-    // if (isPost) {
-    //   String id = const Uuid().v1();
-    //   ref = ref.child(id);
-    // }
+    // ♦♦ Checking: If the "Image" is "Uploaded" to "Storage":
+    if (isPost) {
+      // ♦ Creating a "Unique ID":
+      String id = const Uuid().v1();
+      ref = ref.child(id);
+    }
 
     // ♦♦ Adding a "File" → in this "Location":
     UploadTask uploadTask = ref.putData(file);

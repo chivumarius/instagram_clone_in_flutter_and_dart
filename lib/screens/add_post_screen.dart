@@ -1,10 +1,13 @@
-import 'package:flutter/foundation.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_flutter/providers/user_provider.dart';
+import 'package:instagram_flutter/resources/firestore_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 import 'package:provider/provider.dart';
+import 'package:instagram_flutter/models/user.dart';
 
 class AddPostScreen extends StatefulWidget {
   // ♦ Constructor:
@@ -15,8 +18,9 @@ class AddPostScreen extends StatefulWidget {
 }
 
 class _AddPostScreenState extends State<AddPostScreen> {
-  // ♦ Variable:
+  // ♦ Variables:
   Uint8List? _file;
+  bool isLoading = false;
 
   // ♦ Controller:
   final TextEditingController _descriptionController = TextEditingController();
@@ -68,11 +72,74 @@ class _AddPostScreenState extends State<AddPostScreen> {
     );
   }
 
+  // ♦ the "postImage()" Method
+  //   → for "Storing Data" in the "Database":
+  void postImage(String uid, String username, String profImage) async {
+    // ♦ Displaying the "Linear Loading Indicator"::
+    setState(() {
+      isLoading = true;
+    });
+
+    // ♦ Start the "Loading":
+    try {
+      // ♦ "Upload" to "Storage" and "DB":
+      String res = await FireStoreMethods().uploadPost(
+        _descriptionController.text,
+        _file!,
+        uid,
+        username,
+        profImage,
+      );
+
+      // ♦ Informing the "User" that the "Image" has been "Posted":
+      if (res == "success") {
+        // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+        if (!mounted) return;
+
+        showSnackBar(
+          context,
+          'Posted!',
+        );
+
+        // ♦ Calling the Function:
+        clearImage();
+      } else {
+        // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+        if (!mounted) return;
+
+        showSnackBar(context, res);
+      }
+    } catch (err) {
+      // ♦ Disabling "Display" of the "Linear Loading Indicator":
+      setState(() {
+        isLoading = false;
+      });
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+  }
+
+  // ♦ The "clearImage()" Method:
+  void clearImage() {
+    setState(() {
+      _file = null;
+    });
+  }
+
+  // ♦ The "dispose()" Method:
+  @override
+  void dispose() {
+    super.dispose();
+    _descriptionController.dispose();
+  }
+
   // ♦ The "build()" Method:
   @override
   Widget build(BuildContext context) {
     // ♦ Displaying the "User Profile":
-    final UserProvider userProvider = Provider.of<UserProvider>(context);
+    final User? user = Provider.of<UserProvider>(context).getUser;
 
     // ♦ Conditional Display
     return _file == null
@@ -90,7 +157,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
               backgroundColor: mobileBackgroundColor,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
-                onPressed: () {},
+                onPressed: clearImage,
               ),
               title: const Text(
                 'Post to',
@@ -99,7 +166,13 @@ class _AddPostScreenState extends State<AddPostScreen> {
               actions: <Widget>[
                 // ♦ The "Post" Button:
                 TextButton(
-                  onPressed: () {},
+                  // ♦ "Storing Data" in the "Database"
+                  //   → by the "postImage()" Method:
+                  onPressed: () => postImage(
+                    user!.uid,
+                    user.username,
+                    user.photoUrl,
+                  ),
                   child: const Text(
                     "Post",
                     style: TextStyle(
@@ -115,6 +188,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
             body: Column(
               // ♦ Widgets "List":
               children: <Widget>[
+                // ♦ Conditional "Display" of the "Linear Load Indicator:"
+                isLoading
+                    ? const LinearProgressIndicator()
+                    : const Padding(padding: EdgeInsets.only(top: 0.0)),
                 const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -125,7 +202,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     // ♦ User "Image":
                     CircleAvatar(
                       backgroundImage: NetworkImage(
-                        userProvider.getUser!.photoUrl,
+                        user!.photoUrl,
                       ),
                     ),
 

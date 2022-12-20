@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// ♦ The "Class" (Widget):
+// ♦ Uploading the User in Firebase
+//   → by Creating the "User" Model:
 class User {
   // ♦ Properties:
   final String email;
@@ -11,7 +12,7 @@ class User {
   final List followers;
   final List following;
 
-  // ♦ Constructor:
+  // ♦♦ Constructor:
   const User({
     required this.username,
     required this.uid,
@@ -23,6 +24,8 @@ class User {
   });
 
   // ♦♦ The "fromSnap()" Method
+  //     → which will Take a "DocumentSnapshot"
+  //     → that it will "Convert" into a "User Model":
   static User fromSnap(DocumentSnapshot snap) {
     // ♦ Getting "data()" and Marked "as Map<>":
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -40,8 +43,7 @@ class User {
   }
 
   // ♦♦ The "toJson()" Method
-  //     → to Convert the Requested Arguments
-  //     → into an JSON Object:
+  //     → for "Converting Data" to an "Object" ("Map"):
   Map<String, dynamic> toJson() => {
         "username": username,
         "uid": uid,
