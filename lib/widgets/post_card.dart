@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:intl/intl.dart';
 
 class PostCard extends StatefulWidget {
+  // ♦ Property:
+  final snap;
+
+  // ♦ Constructor
   const PostCard({
     Key? key,
+    required this.snap,
   }) : super(key: key);
 
   @override
@@ -29,10 +35,12 @@ class _PostCardState extends State<PostCard> {
             child: Row(
               children: <Widget>[
                 // ♦ Profile Image:
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 16,
+
+                  // ♦ "Grab" the "Profile Image" from "DB":
                   backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1486848538113-ce1a4923fbc5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTl8fGJhY2tncm91bmQlMjBtb2JpbGxlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+                    widget.snap['profImage'].toString(),
                   ),
                 ),
 
@@ -47,7 +55,10 @@ class _PostCardState extends State<PostCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          'username'.toString(),
+                          // ♦ "Grab" the "Username" from "DB":
+                          widget.snap['username'].toString(),
+
+                          // ♦ Text Style :
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
@@ -97,7 +108,9 @@ class _PostCardState extends State<PostCard> {
             height: MediaQuery.of(context).size.height * 0.35,
             width: double.infinity,
             child: Image.network(
-              'https://images.unsplash.com/photo-1486848538113-ce1a4923fbc5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTl8fGJhY2tncm91bmQlMjBtb2JpbGxlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+              // ♦ "Grab" the "Image" from "DB":
+              widget.snap['postUrl'].toString(),
+
               fit: BoxFit.cover,
             ),
           ),
@@ -105,6 +118,14 @@ class _PostCardState extends State<PostCard> {
           // ♦♦ "Like & Comment Section" of the "Post":
           Row(
             children: <Widget>[
+              // ♦ "Like" Icon Button:
+              IconButton(
+                icon: const Icon(
+                  Icons.favorite,
+                ),
+                onPressed: () {},
+              ),
+
               // ♦ "Comment Outlined" Icon Button:
               IconButton(
                 icon: const Icon(
@@ -147,7 +168,9 @@ class _PostCardState extends State<PostCard> {
                         .subtitle2!
                         .copyWith(fontWeight: FontWeight.w800),
                     child: Text(
-                      '1,231 likes',
+                      // ♦ "Grab" the "Number" of "Likes" from "Database":
+                      '${widget.snap['likes'].length} likes',
+
                       style: Theme.of(context).textTheme.bodyText2,
                     )),
                 Container(
@@ -155,31 +178,40 @@ class _PostCardState extends State<PostCard> {
                   padding: const EdgeInsets.only(
                     top: 8,
                   ),
+
+                  // ♦ "Username" & "Description":
                   child: RichText(
-                    text: const TextSpan(
-                      style: TextStyle(color: primaryColor),
+                    text: TextSpan(
+                      style: const TextStyle(color: primaryColor),
                       children: [
                         // ♦ Username:
                         TextSpan(
-                          text: 'username',
-                          style: TextStyle(
+                          // ♦ "Grab" the "Username" from "Database":
+                          text: widget.snap['username'].toString(),
+
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
 
                         // ♦ Description:
                         TextSpan(
-                          text: 'This is some description',
+                          // ♦ "Grab" the "Description" from "Database":
+                          text: '${widget.snap['description']}',
                         ),
                       ],
                     ),
                   ),
                 ),
+
+                // ♦ "Number" of "Comments":
                 InkWell(
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     child: const Text(
                       'View all 22 comments',
+
+                      // ♦ Text Style:
                       style: TextStyle(
                         fontSize: 16,
                         color: secondaryColor,
@@ -188,11 +220,17 @@ class _PostCardState extends State<PostCard> {
                   ),
                   onTap: () {},
                 ),
+
+                // ♦ "Publication Date":
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4),
-                  child: const Text(
-                    '22/22',
-                    style: TextStyle(
+                  child: Text(
+                    // ♦ "Grab" the "Publication Date" from "Database"
+                    //    → by Using "intl" Package:
+                    DateFormat.yMMMd()
+                        .format(widget.snap['datePublished'].toDate()),
+
+                    style: const TextStyle(
                       color: secondaryColor,
                     ),
                   ),
