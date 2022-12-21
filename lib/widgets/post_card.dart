@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_flutter/models/user.dart' as model;
+import 'package:instagram_flutter/providers/user_provider.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class PostCard extends StatefulWidget {
   // ♦ Property:
@@ -17,8 +21,14 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
+  // ♦ Variable:
+  bool isLikeAnimating = false;
+
   @override
   Widget build(BuildContext context) {
+    // ♦ Getting the "User":
+    final model.User? user = Provider.of<UserProvider>(context).getUser;
+
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(
@@ -104,26 +114,76 @@ class _PostCardState extends State<PostCard> {
           ),
 
           // ♦♦ "Image Section" of the "Post:"
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.35,
-            width: double.infinity,
-            child: Image.network(
-              // ♦ "Grab" the "Image" from "DB":
-              widget.snap['postUrl'].toString(),
+          GestureDetector(
+            // ♦ Detecting "Double Tap" on "Image":
+            onDoubleTap: () {
+              // ♦ Enable:
+              setState(() {
+                isLikeAnimating = true;
+              });
+            },
+            child: Stack(
+              alignment: Alignment.center,
 
-              fit: BoxFit.cover,
+              // ♦ List:
+              children: [
+                // ♦ "Image":
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  width: double.infinity,
+                  child: Image.network(
+                    // ♦ "Grab" the "Image" from "Database":
+                    widget.snap['postUrl'].toString(),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                // ♦ Animation "Like Icon" on the "Image":
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: isLikeAnimating ? 1 : 0,
+                  child: LikeAnimation(
+                    isAnimating: isLikeAnimating,
+
+                    duration: const Duration(
+                      milliseconds: 400,
+                    ),
+                    onEnd: () {
+                      // ♦ Setting:
+                      setState(() {
+                        isLikeAnimating = false;
+                      });
+                    },
+
+                    // ♦ The "Like" Icon on the "Image":
+                    child: const Icon(
+                      Icons.favorite,
+                      color: Colors.white,
+                      size: 100,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
           // ♦♦ "Like & Comment Section" of the "Post":
           Row(
             children: <Widget>[
-              // ♦ "Like" Icon Button:
-              IconButton(
-                icon: const Icon(
-                  Icons.favorite,
+              // ♦ "Like Animation":
+              LikeAnimation(
+                isAnimating: widget.snap['likes'].contains(user?.uid),
+
+                // ♦ Enable "Like":
+                smallLike: true,
+
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.favorite,
+                    color: Colors.red,
+                  ),
+                  onPressed: () {},
                 ),
-                onPressed: () {},
               ),
 
               // ♦ "Comment Outlined" Icon Button:
