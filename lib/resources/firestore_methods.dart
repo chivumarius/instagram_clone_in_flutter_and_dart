@@ -9,7 +9,7 @@ class FireStoreMethods {
   // ♦ Creating Instances of the Class:
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // ♦ The "uploadPost()" Method:
+  // ♦ The "uploadPost()" Function:
   Future<String> uploadPost(
     String description,
     Uint8List file,
@@ -43,6 +43,31 @@ class FireStoreMethods {
       // ♦ Uploading "Post" to "Firebase":
       _firestore.collection('posts').doc(postId).set(post.toJson());
       res = "success";
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+  // ♦ The "likePost()" Function:
+  Future<String> likePost(String postId, String uid, List likes) async {
+    String res = "Some error occurred";
+    try {
+      // Checking: If we "Already Like It":
+      if (likes.contains(uid)) {
+        // ♦ "If" the "Likes List" Contains the "User UID",
+        //   → we Need to "Remove It":
+        _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayRemove([uid])
+        });
+      } else {
+        // ♦ "Else" we Need to "Add UID"
+        //   → to the "Likes Array":
+        _firestore.collection('posts').doc(postId).update({
+          'likes': FieldValue.arrayUnion([uid])
+        });
+      }
+      res = 'success';
     } catch (err) {
       res = err.toString();
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/models/user.dart' as model;
 import 'package:instagram_flutter/providers/user_provider.dart';
+import 'package:instagram_flutter/resources/firestore_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
@@ -117,6 +118,16 @@ class _PostCardState extends State<PostCard> {
           GestureDetector(
             // ♦ Detecting "Double Tap" on "Image":
             onDoubleTap: () {
+              // ♦ Calling the "likePost()" Function:
+              FireStoreMethods().likePost(
+                // ♦ "Grab" the "Post Id" from "Database":
+                widget.snap['postId'].toString(),
+                user!.uid,
+
+                // ♦ "Grab" the "Likes" from "Database":
+                widget.snap['likes'],
+              );
+
               // ♦ Enable:
               setState(() {
                 isLikeAnimating = true;
@@ -178,11 +189,26 @@ class _PostCardState extends State<PostCard> {
                 smallLike: true,
 
                 child: IconButton(
-                  icon: const Icon(
-                    Icons.favorite,
-                    color: Colors.red,
+                  // ♦ Conditional Rendering
+                  //    → for the "Color" of the "Like Icon":
+                  icon: widget.snap['likes'].contains(user?.uid)
+                      ? const Icon(
+                          Icons.favorite,
+                          color: Colors.red,
+                        )
+                      : const Icon(
+                          Icons.favorite_border,
+                        ),
+
+                  // ♦ Calling the "likePost()" Function:
+                  onPressed: () => FireStoreMethods().likePost(
+                    // ♦ "Grab" the "Post Id" from "Database":
+                    widget.snap['postId'].toString(),
+                    user!.uid,
+
+                    // ♦ "Grab" the "Likes" from "Database":
+                    widget.snap['likes'],
                   ),
-                  onPressed: () {},
                 ),
               ),
 
