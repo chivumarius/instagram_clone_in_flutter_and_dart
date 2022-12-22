@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/models/user.dart';
 import 'package:instagram_flutter/providers/user_provider.dart';
+import 'package:instagram_flutter/resources/firestore_methods.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/widgets/comment_card.dart';
 import 'package:provider/provider.dart';
 
 class CommentsScreen extends StatefulWidget {
+  // ♦ Property:
+  final snap;
+
+  // ♦ Constructor:
   const CommentsScreen({
     Key? key,
+    required this.snap,
   }) : super(key: key);
 
   @override
@@ -15,8 +21,19 @@ class CommentsScreen extends StatefulWidget {
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
+  // ♦ Controller:
+  final TextEditingController _commentController = TextEditingController();
+
+  // ♦ The "dispose()" Method:
+  @override
+  void dispose() {
+    super.dispose();
+    _commentController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // ♦ User Provider:
     final User? user = Provider.of<UserProvider>(context).getUser;
 
     return Scaffold(
@@ -29,7 +46,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
       ),
       body: const CommentCard(),
 
-      // → Body:
+      // ♦ Bottom Navigation Bar:
       bottomNavigationBar: SafeArea(
         child: Container(
           height: kToolbarHeight,
@@ -39,20 +56,23 @@ class _CommentsScreenState extends State<CommentsScreen> {
           child: Row(
             children: [
               // ♦ Profile Image
-              const CircleAvatar(
+              CircleAvatar(
                 backgroundImage: NetworkImage(
-                  'https://images.unsplash.com/photo-1558203728-00f45181dd84?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cHJvZmlsZSUyMGltYWdlfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60',
+                  // ♦ Getting the User "Photo URL":
+                  user!.photoUrl,
                 ),
                 radius: 18,
               ),
 
               // ♦ "Comment" → Text Field:
-              const Expanded(
+              Expanded(
                 child: Padding(
                   padding: EdgeInsets.only(left: 16, right: 8),
                   child: TextField(
+                    controller: _commentController,
                     decoration: InputDecoration(
-                      hintText: 'Comment as Username',
+                      // ♦ Getting "Username" in the "Comment":
+                      hintText: 'Comment as ${user.username}',
                       border: InputBorder.none,
                     ),
                   ),
@@ -61,7 +81,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
               // ♦ "Post" the "Comment":
               InkWell(
-                onTap: () {},
+                onTap: () async {
+                  await FireStoreMethods().postComment(
+                    widget.snap['postId'],
+                    _commentController.text,
+                    user.uid,
+                    user.username,
+                    user.photoUrl,
+                  );
+                },
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(vertical: 8, horizontal: 8),

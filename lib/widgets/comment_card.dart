@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class CommentCard extends StatelessWidget {
   const CommentCard({
