@@ -1,9 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/models/user.dart' as model;
 import 'package:instagram_flutter/providers/user_provider.dart';
 import 'package:instagram_flutter/resources/firestore_methods.dart';
 import 'package:instagram_flutter/screens/comments_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/like_animation.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +27,37 @@ class PostCard extends StatefulWidget {
 class _PostCardState extends State<PostCard> {
   // ♦ Variable:
   bool isLikeAnimating = false;
+  int commentLen = 0;
 
+  // ♦ The "initState()" Method:
+  @override
+  void initState() {
+    super.initState();
+    fetchCommentLen();
+  }
+
+  // ♦ The "fetchCommentLen()" Function:
+  fetchCommentLen() async {
+    try {
+      // ♦ Getting the "Data" from "Database":
+      QuerySnapshot snap = await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(widget.snap['postId'])
+          .collection('comments')
+          .get();
+
+      // ♦ Getting the "List" of "All Docs":
+      commentLen = snap.docs.length;
+    } catch (err) {
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+    setState(() {});
+  }
+
+  // ♦ The "build()" Method:
   @override
   Widget build(BuildContext context) {
     // ♦ Getting the "User":
@@ -303,11 +335,12 @@ class _PostCardState extends State<PostCard> {
                 InkWell(
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: const Text(
-                      'View all 22 comments',
+                    child: Text(
+                      // ♦ String Interpolation:
+                      'View all $commentLen comments',
 
                       // ♦ Text Style:
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         color: secondaryColor,
                       ),

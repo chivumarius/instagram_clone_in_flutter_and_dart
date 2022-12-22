@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/models/user.dart';
 import 'package:instagram_flutter/providers/user_provider.dart';
@@ -44,7 +45,39 @@ class _CommentsScreenState extends State<CommentsScreen> {
         ),
         centerTitle: false,
       ),
-      body: const CommentCard(),
+
+      // ♦ Using "StreamBuilder()" Widget
+      //    → for "Retrieving Data" in "Real Time"
+      //    → from the "Database" and Display i:
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('posts')
+            .doc(widget.snap['postId'])
+            .collection('comments')
+            .orderBy(
+              'datePublished',
+              descending: true,
+            )
+            .snapshots(),
+        builder: (context,
+            AsyncSnapshot<QuerySnapshot<Map<String, dynamic>>> snapshot) {
+          // ♦ If the "Connection State" is in "Waiting":
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // ♦ Returning the "Loading Indicator":
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          // ♦ "Getting" & "Displaying" the "List" of "Comments" from "Database":
+          return ListView.builder(
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (ctx, index) => CommentCard(
+              snap: (snapshot.data! as dynamic).docs[index].data(),
+            ),
+          );
+        },
+      ),
 
       // ♦ Bottom Navigation Bar:
       bottomNavigationBar: SafeArea(
@@ -89,6 +122,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     user.username,
                     user.photoUrl,
                   );
+
+                  // ♦ "Emptying" the "Text Input Field"
+                  //    → after Pressing "Post Button":
+                  setState(() {
+                    _commentController.text = '';
+                  });
                 },
                 child: Container(
                   padding:

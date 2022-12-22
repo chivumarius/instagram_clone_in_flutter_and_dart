@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class CommentCard extends StatelessWidget {
+  // ♦ Property:
+  final snap;
+
+  // ♦ Constructor:
   const CommentCard({
     Key? key,
+    required this.snap,
   }) : super(key: key);
 
   @override
@@ -12,9 +18,11 @@ class CommentCard extends StatelessWidget {
       child: Row(
         children: [
           // ♦ Profile Image:
-          const CircleAvatar(
+          CircleAvatar(
             backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1619539465730-fea9ebf950f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHByb2ZpbGUlMjBpbWFnZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60',
+              // "Getting" and "Displaying" the "Profile Picture"
+              //  → from the "Database":
+              snap['profilePic'],
             ),
             radius: 18,
           ),
@@ -30,29 +38,36 @@ class CommentCard extends StatelessWidget {
                 children: [
                   // ♦ "User Name" & "Text" for the "Comment"
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
-                        // ♦ "User Name":
                         TextSpan(
-                            text: 'username',
-                            style: TextStyle(
+                            // "Getting" and "Displaying" the "User Name"
+                            //  → from the "Database":
+                            text: snap['name'],
+
+                            // ♦ Style:
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             )),
-
-                        // ♦ The "Text" for the "Comment":
                         TextSpan(
-                          text: 'Some description to insert',
+                          // "Getting" and "Displaying" the "Comment Text"
+                          //  → from the "Database":
+                          text: ' ${snap['text']}',
                         ),
                       ],
                     ),
                   ),
 
-                  // ♦ "Publication Date":
-                  const Padding(
+                  // ♦ "Publish Date":
+                  Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
-                      '30/12/2022',
-                      style: TextStyle(
+                      // "Getting" and "Displaying" the "Publish Date"
+                      //  → from the "Database":
+                      DateFormat.yMMMd().format(
+                        snap['datePublished'].toDate(),
+                      ),
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
                       ),
