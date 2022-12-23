@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/utils/colors.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:instagram_flutter/utils/global_variable.dart';
+
 
 class SearchScreen extends StatefulWidget {
   // ♦ Constructor:
@@ -48,8 +51,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
       // ♦ BODY:
       body: isShowUsers
-          ? FutureBuilder(
-              // ♦ Detting "Users" Collection:
+          ?
+            // ♦ "Users Search" Builder:
+            FutureBuilder(
+              // ♦ Getting "Users" Collection:
               future: FirebaseFirestore.instance
                   .collection('users')
                   .where(
@@ -57,8 +62,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     isGreaterThanOrEqualTo: searchController.text,
                   )
                   .get(),
-              builder: (context, snapshot) {
 
+              // ♦ "User" Builder:
+              builder: (context, snapshot) {
                 // ♦ Checking:
                 if (!snapshot.hasData) {
                   // ♦ Displaying "Loading Indicator":
@@ -90,7 +96,53 @@ class _SearchScreenState extends State<SearchScreen> {
                 );
               },
             )
-          : const Text('Posts'),
+          :
+            // ♦ "Posts Search" Builder:
+            FutureBuilder(
+              // ♦ Getting "Posts" Collection:
+              future: FirebaseFirestore.instance
+                  .collection('posts')
+                  .orderBy('datePublished')
+                  .get(),
+
+              // ♦ "Post" Builder:
+              builder: (context, snapshot) {
+                // ♦ Checking:
+                if (!snapshot.hasData) {
+                  // ♦ Displaying "Loading Indicator":
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                // ♦ "Post Grid View" Builder:
+                return StaggeredGridView.countBuilder(
+                  crossAxisCount: 3,
+
+                  // ♦ Getting the "Items Number"
+                  itemCount: (snapshot.data! as dynamic).docs.length,
+
+                  itemBuilder: (context, index) => Image.network(
+                    // ♦ Getting the "Post URL" from "Database":
+                    (snapshot.data! as dynamic).docs[index]['postUrl'],
+                    fit: BoxFit.cover,
+                  ),
+
+                  staggeredTileBuilder: (index) => MediaQuery.of(context)
+                      .size
+                      .width >
+                      webScreenSize
+                      ? StaggeredTile.count(
+                      (index % 7 == 0) ? 1 : 1, (index % 7 == 0) ? 1 : 1)
+                      : StaggeredTile.count(
+                      (index % 7 == 0) ? 2 : 1, (index % 7 == 0) ? 2 : 1),
+
+                  // ♦ Spacing:
+                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 8.0,
+                );
+              },
+            ),
     );
   }
 }
