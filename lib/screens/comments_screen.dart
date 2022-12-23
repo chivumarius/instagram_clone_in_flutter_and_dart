@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 class CommentsScreen extends StatefulWidget {
   // ♦ Property:
-  final snap;
+  final dynamic snap;
 
   // ♦ Constructor:
   const CommentsScreen({
@@ -100,7 +100,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
               // ♦ "Comment" → Text Field:
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(left: 16, right: 8),
+                  padding: const EdgeInsets.only(left: 16, right: 8),
                   child: TextField(
                     controller: _commentController,
                     decoration: InputDecoration(

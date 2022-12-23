@@ -57,11 +57,8 @@ class _FeedScreenState extends State<FeedScreen> {
             // ♦ "Counting" the "Items" of the "List":
             itemCount: snapshot.data!.docs.length,
 
-            itemBuilder: (ctx, index) => Container(
-              // ♦ "Rendering" the "Data" oh the "PostCard()":
-              child: PostCard(
-                snap: snapshot.data!.docs[index].data(),
-              ),
+            itemBuilder: (ctx, index) => PostCard(
+              snap: snapshot.data!.docs[index].data(),
             ),
           );
         },

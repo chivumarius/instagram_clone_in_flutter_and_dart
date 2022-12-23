@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 class CommentCard extends StatelessWidget {
   // ♦ Property:
-  final snap;
+  final dynamic  snap;
 
   // ♦ Constructor:
   const CommentCard({

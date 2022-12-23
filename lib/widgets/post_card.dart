@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:instagram_flutter/models/user.dart' as model;
 import 'package:instagram_flutter/providers/user_provider.dart';
-import 'package:instagram_flutter/resources/firestore_methods.dart';
+import 'package:instagram_flutter/resources/firestore_methods.dart' show FireStoreMethods;
 import 'package:instagram_flutter/screens/comments_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class PostCard extends StatefulWidget {
   // ♦ Property:
-  final snap;
+  final dynamic snap;
 
   // ♦ Constructor
   const PostCard({
@@ -133,7 +133,14 @@ class _PostCardState extends State<PostCard> {
                                             vertical: 12, horizontal: 16),
                                         child: Text(e),
                                       ),
-                                      onTap: () {},
+
+                                      // ♦ "Deleting Post":
+                                      onTap: () async {
+                                        // ♦ Removing the "Post"
+                                        FireStoreMethods().deletePost(widget.snap['postId']);
+                                        // ♦ Removing the "Dialog Box":
+                                        Navigator.of(context).pop();
+                                      },
                                     ),
                                   )
                                   .toList()),
@@ -166,6 +173,7 @@ class _PostCardState extends State<PostCard> {
                 isLikeAnimating = true;
               });
             },
+
             child: Stack(
               alignment: Alignment.center,
 

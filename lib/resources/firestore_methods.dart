@@ -103,4 +103,21 @@ class FireStoreMethods {
     }
     return res;
   }
+
+  // ♦ The "deletePost" Method:
+  Future<String> deletePost(String postId) async {
+    // ♦ Variable:
+    String res = "Some error occurred";
+
+    try {
+      // ♦ Calling ".delete()" Function:
+      await _firestore.collection('posts').doc(postId).delete();
+
+      // ♦ Reset Variable as:
+      res = 'success';
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
 }

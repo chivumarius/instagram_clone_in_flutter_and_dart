@@ -29,9 +29,9 @@ class _ResponsiveLayoutState extends State<ResponsiveLayout> {
 
   // ♦♦ The "addData()" Method:
   addData() async {
-    UserProvider _userProvider =
+    UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
-    await _userProvider.refreshUser();
+    await userProvider.refreshUser();
   }
 
   // ♦♦ The "build()" Method:

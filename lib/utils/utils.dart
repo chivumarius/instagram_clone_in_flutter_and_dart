@@ -6,11 +6,11 @@ import 'package:image_picker/image_picker.dart';
 pickImage(ImageSource source) async {
   // ♦♦ Creating the "Instance" of "ImagePicker" Class:
   final ImagePicker imagePicker = ImagePicker();
-  XFile? _file = await imagePicker.pickImage(source: source);
+  XFile? file = await imagePicker.pickImage(source: source);
 
   // ♦♦ Checking:
-  if (_file != null) {
-    return await _file.readAsBytes();
+  if (file != null) {
+    return await file.readAsBytes();
   }
   // ♦ Otherwise:
   debugPrint('No Image Selected');
