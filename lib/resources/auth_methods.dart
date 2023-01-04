@@ -1,3 +1,4 @@
+
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,7 +18,7 @@ class AuthMethods {
     User currentUser = _auth.currentUser!;
 
     DocumentSnapshot documentSnapshot =
-        await _firestore.collection('users').doc(currentUser.uid).get();
+    await _firestore.collection('users').doc(currentUser.uid).get();
 
     return model.User.fromSnap(documentSnapshot);
   }
@@ -93,7 +94,7 @@ class AuthMethods {
     return res;
   }
 
-  // ♦♦ The "loginUser" Async Method
+  // ♦♦ The "loginUser" Async Function
   //    → with the "Required Parameters" for "Log In User":
   Future<String> loginUser({
     required String email,
@@ -130,4 +131,10 @@ class AuthMethods {
     }
     return res;
   }
+
+  // ♦♦ The "signOut()" Async Function:
+  Future<void> signOut() async {
+    await _auth.signOut();
+  }
+
 }

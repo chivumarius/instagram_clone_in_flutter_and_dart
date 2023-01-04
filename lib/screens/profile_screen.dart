@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_flutter/resources/auth_methods.dart';
 import 'package:instagram_flutter/resources/firestore_methods.dart';
+import 'package:instagram_flutter/screens/login_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/utils/utils.dart';
 import 'package:instagram_flutter/widgets/follow_button.dart';
@@ -198,11 +200,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ?
                                           // ♦ "Sign Out" Button:
                                           FollowButton(
-                                            text: 'Edit Profile',
-                                            backgroundColor: mobileBackgroundColor,
+                                            text: 'Sign Out',
+                                            backgroundColor:
+                                            mobileBackgroundColor,
                                             textColor: primaryColor,
                                             borderColor: Colors.grey,
-                                            function: () {},
+
+                                            function: () async {
+                                              // ♦ Calling the "signOut()" function
+                                              await AuthMethods().signOut();
+
+                                              // ♦♦ Avoiding "Do Not Use BuildContexts Across Async Gaps" Error:
+                                              if (!mounted) return;
+
+                                              // ♦ "Redirecting" the "User"
+                                              //   → to the "Login Screen":
+                                              Navigator.of(context)
+                                                  .pushReplacement(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                  const LoginScreen(),
+                                                ),
+                                              );
+                                            },
                                           )
                                         :
                                           isFollowing
