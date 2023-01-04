@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_flutter/screens/profile_screen.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:instagram_flutter/utils/global_variable.dart';
@@ -79,17 +80,33 @@ class _SearchScreenState extends State<SearchScreen> {
                   itemCount: (snapshot.data! as dynamic).docs.length,
 
                   itemBuilder: (context, index) {
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          // ♦ Getting the "photoUrl" from "Database":
-                          (snapshot.data! as dynamic).docs[index]['photoUrl'],
+
+                    // ♦ "Rectangular Area" of a "Material"
+                    //    → that "Responds" to "Touch":
+                    return InkWell(
+                      // ♦ "Redirection" to "Profile Screen":
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ProfileScreen(
+                            uid: (snapshot.data! as dynamic).docs[index]['uid'],
+                          ),
                         ),
-                        radius: 16,
                       ),
-                      title: Text(
-                        // ♦ Getting the "Username" from "Database":
-                        (snapshot.data! as dynamic).docs[index]['username'],
+
+                      // ♦ Single Fixed-Height "Row"
+                      //   → that contains a "Text" and an "Icon":
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            // ♦ Getting the "photoUrl" from "Database":
+                            (snapshot.data! as dynamic).docs[index]['photoUrl'],
+                          ),
+                          radius: 16,
+                        ),
+                        title: Text(
+                          // ♦ Getting the "Username" from "Database":
+                          (snapshot.data! as dynamic).docs[index]['username'],
+                        ),
                       ),
                     );
                   },
