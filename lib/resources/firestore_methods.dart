@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:instagram_flutter/models/post.dart';
 import 'package:instagram_flutter/resources/storage_methods.dart';
 import 'package:uuid/uuid.dart';
@@ -104,7 +105,7 @@ class FireStoreMethods {
     return res;
   }
 
-  // ♦ The "deletePost" Method:
+  // ♦ The "deletePost()" Method:
   Future<String> deletePost(String postId) async {
     // ♦ Variable:
     String res = "Some error occurred";
@@ -119,5 +120,52 @@ class FireStoreMethods {
       res = err.toString();
     }
     return res;
+  }
+
+  // ♦ The "followUser()" Method:
+  Future<void> followUser(
+      String uid,
+      String followId
+      ) async {
+
+        // ♦ Blocks:
+        try {
+          // ♦ Getting the "UID Data" from "Database":
+          DocumentSnapshot snap = await _firestore.collection('users').doc(uid).get();
+
+          // ♦ Getting the "List" of "Following":
+          List following = (snap.data()! as dynamic)['following'];
+
+          // ♦ Checking in the "List" of "Following": :
+          if(following.contains(followId)) {
+            // ♦ Updating the "Follow Id" for the "Users":
+            await _firestore.collection('users').doc(followId).update({
+              // ♦ Removing the "UID":
+              'followers': FieldValue.arrayRemove([uid])
+            });
+
+            // ♦ Updating the "UID" for the "Users":
+            await _firestore.collection('users').doc(uid).update({
+              // ♦ Removing the "Follow ID":
+              'following': FieldValue.arrayRemove([followId])
+            });
+          } else {
+
+            // ♦ Updating the "Follow Id" for the "Users":
+            await _firestore.collection('users').doc(followId).update({
+              // ♦ Adding the "UID":
+              'followers': FieldValue.arrayUnion([uid])
+            });
+
+            // ♦ Updating the "UID" for the "Users":
+            await _firestore.collection('users').doc(uid).update({
+              // ♦ Adding the "Follow ID":
+              'following': FieldValue.arrayUnion([followId])
+            });
+          }
+
+        } catch(e) {
+          debugPrint(e.toString());
+        }
   }
 }
