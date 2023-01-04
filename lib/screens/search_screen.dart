@@ -145,14 +145,16 @@ class _SearchScreenState extends State<SearchScreen> {
                     fit: BoxFit.cover,
                   ),
 
+                  // ♦ "Checking" the "Condition"
+                  //   → for "Responsive Screen Size":
                   staggeredTileBuilder: (index) => MediaQuery.of(context)
-                      .size
-                      .width >
-                      webScreenSize
-                      ? StaggeredTile.count(
-                      (index % 7 == 0) ? 1 : 1, (index % 7 == 0) ? 1 : 1)
-                      : StaggeredTile.count(
-                      (index % 7 == 0) ? 2 : 1, (index % 7 == 0) ? 2 : 1),
+                      .size.width > webScreenSize
+                      ?
+                        StaggeredTile.count(
+                          (index % 7 == 0) ? 1 : 1, (index % 7 == 0) ? 1 : 1)
+                      :
+                        StaggeredTile.count(
+                          (index % 7 == 0) ? 2 : 1, (index % 7 == 0) ? 2 : 1),
 
                   // ♦ Spacing:
                   mainAxisSpacing: 8.0,

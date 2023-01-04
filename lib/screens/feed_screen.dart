@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_flutter/utils/colors.dart';
 import 'package:instagram_flutter/widgets/post_card.dart';
+import 'package:instagram_flutter/utils/global_variable.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({Key? key}) : super(key: key);
@@ -14,8 +15,26 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> {
   @override
   Widget build(BuildContext context) {
+    // ♦ Variable:
+    final width = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: AppBar(
+
+      // ♦ Checking the Condition:
+      backgroundColor:  width > webScreenSize
+                        ?
+                          webBackgroundColor
+                        :
+                          mobileBackgroundColor,
+
+      // ♦ Checking the Condition:
+      appBar: width > webScreenSize
+              ?
+                // ♦ Don't Show "AppB Bar":
+                null
+              :
+                // ♦ Showing "AppB Bar":
+               AppBar(
         backgroundColor: mobileBackgroundColor,
         centerTitle: false,
         title: SvgPicture.asset(
@@ -57,8 +76,15 @@ class _FeedScreenState extends State<FeedScreen> {
             // ♦ "Counting" the "Items" of the "List":
             itemCount: snapshot.data!.docs.length,
 
-            itemBuilder: (ctx, index) => PostCard(
-              snap: snapshot.data!.docs[index].data(),
+            itemBuilder: (ctx, index) => Container(
+              margin: EdgeInsets.symmetric(
+                // ♦ Checking the Condition:
+                horizontal: width > webScreenSize ? width * 0.3 : 0,
+                vertical: width > webScreenSize ? 15 : 0,
+              ),
+              child: PostCard(
+                snap: snapshot.data!.docs[index].data(),
+              ),
             ),
           );
         },
